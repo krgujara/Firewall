@@ -1,0 +1,64 @@
+/**
+ * IpAddress class defines a custom class to handle the operations relating to IP Address. 
+ * @author      Komal Gujarathi
+ * @version     1
+ */
+
+package IpAddress;
+
+public class IpAddress {
+	private long lowerIp;
+	private long upperIp;
+	/**
+	 * Constructor
+	 * @param lowerIp (long): ip address/ the first value if the rule is given as a range of ip addresses.
+	 * @param upperIp (long): 0/ the second value if the rule is given as a range of ip addresses.
+	*/
+	public IpAddress(String addr1, String addr2) {
+		lowerIp = convertStringIpToInt(addr1);
+		upperIp = convertStringIpToInt(addr2);
+	}
+
+	private long convertStringIpToInt(String addr) {
+		long address = 0;
+		String[] addrArray = addr.split("\\.");
+
+		for (int i = 0; i < addrArray.length; i++) {
+			int power = 3 - i;
+			address += ((Integer.parseInt(addrArray[i]) % 256 * Math.pow(256, power)));
+		}
+		return address;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (lowerIp ^ (lowerIp >>> 32));
+		result = prime * result + (int) (upperIp ^ (upperIp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IpAddress other = (IpAddress) obj;
+
+		if (upperIp == 0) {
+			if (lowerIp != other.lowerIp)
+				return false;
+		} else if (lowerIp > other.lowerIp || upperIp < other.upperIp)
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "IpAddress [lowerIp=" + lowerIp + ", upperIp=" + upperIp + "]";
+	}
+}

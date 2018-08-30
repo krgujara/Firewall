@@ -1,0 +1,16 @@
+package IpAddress;
+
+public class IpAddress {
+	
+	int address;
+	public IpAddress(String address) {
+		String[] addrArray = address.split("\\.");
+
+		long num = 0;
+
+		for (int i=0;i<addrArray.length;i++) {
+
+		int power = 3-i;
+	}
+	
+}

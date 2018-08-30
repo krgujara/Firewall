@@ -1,0 +1,177 @@
+/**
+ * Firewall class holds the set of allowedRules, 
+ * and decides if a package should be accepted with respect to the allowedRules. 
+ * @author      Komal Gujarathi
+ * @version     1
+ */
+package Firewall;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import Firewall.Rule.directions;
+import Firewall.Rule.protocols;
+import java.util.concurrent.*;
+
+import com.google.common.collect.*;
+
+
+public class Firewall {
+	// list of all the allowedRules
+	private List<Rule> allowedRules = new ArrayList<>();
+	private static final int NUM_THREADS = 10;
+	
+	private boolean ruleMatched;
+	/**
+	 * Constructor
+	 * @param rulesFile (string): path to the csv files, from where the rules are to be loaded.
+	 */ 
+
+	public Firewall(String rulesFile) {
+		try 
+		{
+			File file = new File(rulesFile);
+			// read from the file
+			Scanner inputStream = new Scanner(file);
+			while (inputStream.hasNext()) {
+
+				String eachInputLine = inputStream.next();
+				String[] values = eachInputLine.split(","); 
+				// values is the array of direction, protocol, port, ip address
+				for (int i = 0; i < values.length; i++)
+				{
+					// extract port numbers (can be a value/ a range)
+					String[] ports = values[2].split("-");
+
+					int portBegin = Integer.valueOf(ports[0]);
+					int portEnd = (ports.length > 1) ? Integer.valueOf(ports[1]) : 0;
+
+					// extract ip address (can be a value/ a range)
+					String[] ipaddresses = values[3].split("-");
+					String ipBegin = ipaddresses[0];
+					String ipEnd = ipaddresses.length > 1 ? ipaddresses[1] : "0";
+
+					Rule each = new Rule(directions.valueOf(values[0]), protocols.valueOf(values[1]), portBegin,
+							portEnd, ipBegin, ipEnd);
+					allowedRules.add(each);
+				}
+			}
+			inputStream.close();
+			ruleMatched = false;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch(Exception e) {
+			
+		}
+	}
+
+	/**
+	 * Function that takes exactly four arguments and returns a boolean: true,
+	 * if there exists a rule in the file that this object was initialized with that allows traffic with these particular properties, 
+	 * and false otherwise.
+	 * @param direction (string): “inbound” or “outbound”
+ 	 * @param protocol (string): exactly one of “tcp” or “udp”, all lowercase 
+ 	 * @param port (integer) – an integer in the range [1, 65535]
+ 	 * @param ip_address (string): a single well-formed IPv4 address.
+	 * @return boolean value : if package is allowed true/ else false
+	 */ 
+	public boolean accept_packet(String direction, String protocol, Integer port, String ipAddress) {
+		try
+		{
+			Rule packetToTest = new Rule(directions.valueOf(direction), protocols.valueOf(protocol), port, 0, ipAddress,
+					"0");
+			
+			// creating a thread pool
+			ExecutorService pool = Executors.newFixedThreadPool(NUM_THREADS);
+			
+			
+			// divide the allowedRules list into chunks, and send it to the seperate threads to execute
+			// I have used Guava library to accomplish this. 
+			// This function form Guava library Lists.partition takes 2 parameters
+			// arg1 - List to return consecutive sublists of
+			// size - the desired size of each sublist (the last one may be smaller)
+			// reference - https://google.github.io/guava/releases/snapshot/api/docs/com/google/common/collect/Lists.html#partition-java.util.List-int-
+			
+			for(List<Rule> partition : Lists.partition(allowedRules, allowedRules.size()/10))
+			{
+				if(ruleMatched)
+					return true;
+				Runnable  packetValidator = new PacketValidator(partition, packetToTest);
+				pool.submit(packetValidator);
+			}
+			/*
+			// for all the rules, check if any rule allows this package.. if so, return true.
+			for (int i = 0; i < allowedRules.size(); i++) {
+				Rule currRule = allowedRules.get(i);
+				if (currRule.equals(packetToTest))
+					return true;
+			}
+			*/
+		}
+		
+		catch(Exception e)
+		{
+			System.out.println("Ooohhh... Some went wrong");
+		}
+		ruleMatched = false;
+		return false;
+	}
+	/*
+	/**
+	 * Function that takes exactly four arguments and returns a boolean: true,
+	 * if there exists a rule in the file that this object was initialized with that allows traffic with these particular properties, 
+	 * and false otherwise.
+	 * @param direction (string): “inbound” or “outbound”
+ 	 * @param protocol (string): exactly one of “tcp” or “udp”, all lowercase 
+ 	 * @param port (integer) – an integer in the range [1, 65535]
+ 	 * @param ip_address (string): a single well-formed IPv4 address.
+	 * @return boolean value : if package is allowed true/ else false
+	 **
+	public boolean accept_packet(String direction, String protocol, Integer port, String ipAddress) {
+		try
+		{
+			Rule packetToTest = new Rule(directions.valueOf(direction), protocols.valueOf(protocol), port, 0, ipAddress,
+					"0");
+			
+			// for all the rules, check if any rule allows this package.. if so, return true.
+			for (int i = 0; i < allowedRules.size(); i++) {
+				Rule currRule = allowedRules.get(i);
+				if (currRule.equals(packetToTest))
+					return true;
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("Ooohhh... Some went wrong");
+		}
+		return false;
+	}
+	*/
+	class PacketValidator implements Runnable
+	{
+		List<Rule> rulesChunk;
+		Rule packetToTest;
+		public PacketValidator(List<Rule> rulesChunk, Rule packetToTest) {
+			// TODO Auto-generated constructor stub
+			this.rulesChunk = rulesChunk;
+			this.packetToTest = packetToTest;
+		}
+		
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			for (int i = 0; i < rulesChunk.size(); i++) {
+				Rule currRule = rulesChunk.get(i);
+				if (currRule.equals(packetToTest))
+				{
+					System.out.println(currRule);
+					break;
+				}
+			}
+			ruleMatched = true;
+		}
+		
+	}
+	
+}

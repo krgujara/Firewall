@@ -1,0 +1,31 @@
+package IpAddress;
+
+public class IpAddress {
+	long lowerIp;
+	long upperIp;
+	
+	public IpAddress(String addr1, String addr2) {
+		lowerIp = convertStringIpToInt(addr1);
+		upperIp = convertStringIpToInt(addr2);
+	}
+	private long convertStringIpToInt(String addr)
+	{
+		long address = 0;
+		String[] addrArray = addr.split("\\.");
+
+		for (int i=0;i<addrArray.length;i++) {
+			int power = 3-i;
+			address += ((Integer.parseInt(addrArray[i])%256 * Math.pow(256,power)));
+		}
+		return address;
+	}	
+
+
+	// test client for ip address
+	public static void main(String[] args)
+	{
+		IpAddress addr = new IpAddress("128.127.1.1","128.129.1.1");
+		IpAddress addr1 = new IpAddress("0.0.255.1","0");
+
+	}
+}

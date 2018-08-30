@@ -1,0 +1,14 @@
+package FirewallClient;
+
+import Firewall.Firewall;
+
+public class Client {
+	public static void main(String[] args)
+	{
+		System.out.println("HI Komal");
+		Firewall prototype = new Firewall("../FirewallPrototype/bin/Firewall/rules.csv");
+		System.out.println(accept_packet("inbound", "tcp", 123, 0, 1212,1212));
+		
+		
+	}
+}

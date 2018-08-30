@@ -1,0 +1,62 @@
+package Firewall;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+import Firewall.AllowedRule.directions;
+import Firewall.AllowedRule.protocols;
+
+public class Firewall {
+	ArrayList<AllowedRule> allowedRules = new ArrayList<>();
+	
+	public Firewall(String rulesFile)
+	{
+		File file = new File(rulesFile);
+			
+		try
+		{
+			// read from the file
+			Scanner inputStream = new Scanner(file);
+			while(inputStream.hasNext())
+			{
+				
+				String data = inputStream.next();
+				String[] values = data.split(",");
+				for(int i = 0; i < values.length; i++);
+				{
+					
+					String[] ports = values[2].split("-");
+					
+					int portBegin = Integer.valueOf(ports[0]);
+					int portEnd = (ports.length > 1) ? Integer.valueOf(ports[1]) : 0;
+					
+					//String[] ipaddresses = values[3].split("-"); 
+					//int ipBegin = Integer.valueOf(ipaddresses[0]);
+					//int ipEnd = ipaddresses.length > 1 ? Integer.valueOf(ipaddresses[1]) : 0;
+					AllowedRule each = new AllowedRule(directions.valueOf(values[0]), protocols.valueOf(values[1]), portBegin, portEnd, 1233, 122);
+					allowedRules.add(each);
+				}	
+			}
+			//System.out.println("AllowedRules " + allowedRules);
+			inputStream.close();
+		}
+		catch(FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	public boolean accept_packet(String direction, String protocol, Integer port, int ipAddress)
+	{
+		AllowedRule packetToTest = new AllowedRule(directions.valueOf(direction), protocols.valueOf(protocol), port, 0, ipAddress, 0);
+		// for all the runes, check
+		for(int i = 0 ; i < allowedRules.size(); i++)
+		{
+			AllowedRule currRule = allowedRules.get(i));
+			if(currRule.equals(packetToTest))
+				return true;
+		}
+		return false;
+	}
+	
+	
+}

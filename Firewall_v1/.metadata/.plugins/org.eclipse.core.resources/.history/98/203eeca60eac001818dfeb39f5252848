@@ -1,0 +1,66 @@
+package Firewall;
+
+public class AllowedRule {
+	
+	public enum directions {inbound, outbound};
+	public enum protocols {tcp, udp};
+	
+	directions direction;
+	protocols protocol;
+	private int portBegin;
+	private int portEnd;
+	private int ipAddressBegin;
+	private int ipAddressEnd;
+	
+	public AllowedRule(directions direction, protocols protocol, int portBegin, int portEnd, int ipAddressBegin,
+			int ipAddressEnd) {
+		super();
+		this.direction = direction;
+		this.protocol = protocol;
+		this.portBegin = portBegin;
+		this.portEnd = portEnd;
+		this.ipAddressBegin = ipAddressBegin;
+		this.ipAddressEnd = ipAddressEnd;
+	}
+
+	@Override
+	public String toString() {
+		return "AllowedRule [direction=" + direction + ", protocol=" + protocol + ", portBegin=" + portBegin
+				+ ", portEnd=" + portEnd + ", ipAddressBegin=" + ipAddressBegin + ", ipAddressEnd=" + ipAddressEnd
+				+ "]";
+	}
+/*
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((direction == null) ? 0 : direction.hashCode());
+		result = prime * result + portBegin;
+		result = prime * result + portEnd;
+		result = prime * result + ((protocol == null) ? 0 : protocol.hashCode());
+		return result;
+	}
+*/
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		AllowedRule other = (AllowedRule) obj;
+		System.out.println(other.toString());
+		
+		if (direction != other.direction)
+			return false;
+		if(other.portEnd == 0)
+			if(portBegin != other.portBegin)
+				return false;
+		else if (other.portBegin < portBegin || portEnd < other.portEnd)
+			return false;
+		if (protocol != other.protocol)
+			return false;
+	
+		return true;
+	}
+
+}

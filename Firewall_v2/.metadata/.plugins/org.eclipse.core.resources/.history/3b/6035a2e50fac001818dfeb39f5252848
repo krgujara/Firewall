@@ -1,0 +1,61 @@
+package IpAddress;
+
+public class IpAddress {
+	long lowerIp;
+	long upperIp;
+	
+	public IpAddress(String lowerIp, String upperIp) {
+		
+	}
+	long convertStringIpToInt(String addr)
+	{
+		long address = 0;
+		String[] addrArray = addr.split("\\.");
+
+		for (int i=0;i<addrArray.length;i++) {
+			int power = 3-i;
+			address += ((Integer.parseInt(addrArray[i])%256 * Math.pow(256,power)));
+		}
+		return address;
+	}
+	
+	public long getAddress() {
+		return address;
+	}
+
+	public void setAddress(long address) {
+		this.address = address;
+	}
+
+	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (address ^ (address >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		IpAddress other = (IpAddress) obj;
+		if (address != other.address)
+			return false;
+		return true;
+	}
+
+	// test client for ip address
+	public static void main(String[] args)
+	{
+		IpAddress addr = new IpAddress("128.127.1.1");
+		IpAddress addr1 = new IpAddress("0.0.255.1");
+
+	}
+}

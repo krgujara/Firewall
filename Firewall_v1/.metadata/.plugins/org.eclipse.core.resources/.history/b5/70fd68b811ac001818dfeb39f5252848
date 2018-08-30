@@ -1,0 +1,52 @@
+package Firewall;
+
+import IpAddress.IpAddress;
+
+public class Rule {
+	
+	public enum directions {inbound, outbound};
+	public enum protocols {tcp, udp};
+	
+	directions direction;
+	protocols protocol;
+	private int portBegin;
+	private int portEnd;
+	IpAddress ip;
+	
+	public Rule(directions direction, protocols protocol, int portBegin, int portEnd, String ipAddressBegin,
+			String ipAddressEnd) {
+		super();
+		this.direction = direction;
+		this.protocol = protocol;
+		this.portBegin = portBegin;
+		this.portEnd = portEnd;
+		this.ipAddressBegin = ipAddressBegin;
+		this.ipAddressEnd = ipAddressEnd;
+	}
+
+	@Override
+	public String toString() {
+		return "AllowedRule [direction=" + direction + ", protocol=" + protocol + ", portBegin=" + portBegin
+				+ ", portEnd=" + portEnd + ", ipAddressBegin=" + ipAddressBegin + ", ipAddressEnd=" + ipAddressEnd
+				+ "]";
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Rule other = (Rule) obj;
+		
+		if (direction != other.direction)
+			return false;
+		if(other.portEnd == 0)
+			if(portBegin != other.portBegin)
+				return false;
+		else if (other.portBegin < portBegin || portEnd < other.portEnd)
+			return false;
+		if (protocol != other.protocol)
+			return false;
+	
+		return true;
+	}
+}

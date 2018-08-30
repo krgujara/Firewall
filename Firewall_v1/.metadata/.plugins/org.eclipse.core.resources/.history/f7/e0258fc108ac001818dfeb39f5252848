@@ -1,0 +1,15 @@
+package IpAddress;
+
+public class IpAddress {
+	
+	long address;
+	public IpAddress(String addr) {
+		String[] addrArray = addr.split("\\.");
+
+		for (int i=0;i<addrArray.length;i++) {
+			int power = 3-i;
+			address += ((Integer.parseInt(addrArray[i])%256 * Math.pow(256,power)));
+		}
+	}
+	
+}

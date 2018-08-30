@@ -1,0 +1,69 @@
+/**
+ * Rule class holds all the attributes (direction, protocol, port, ipAddress)for a allowed Rule. 
+ * @author      Komal Gujarathi
+ * @version     1
+ */
+package Firewall;
+
+import IpAddress.IpAddress;
+
+public class Rule {
+
+	public enum directions {
+		inbound, outbound
+	};
+
+	public enum protocols {
+		tcp, udp
+	};
+
+	directions direction;
+	protocols protocol;
+	private int portBegin;
+	private int portEnd;
+	IpAddress ipAddress;
+
+	/**
+	 * Constructor
+	 * @param direction (directions enum): values can be inbound/ outbound
+	 * @param protocol (protocols enum): values can be tcp/ udp
+	 * @param direction (directions enum): inbound/ outbound
+	 * @param direction (directions enum): inbound/ outbound
+	 * 
+	 */ 
+	public Rule(directions direction, protocols protocol, int portBegin, int portEnd, String ipAddressBegin,
+			String ipAddressEnd) {
+		super();
+		this.direction = direction;
+		this.protocol = protocol;
+		this.portBegin = portBegin;
+		this.portEnd = portEnd;
+		this.ipAddress = new IpAddress(ipAddressBegin, ipAddressEnd);
+	}
+
+	@Override
+	public String toString() {
+		return "Rule [direction=" + direction + ", protocol=" + protocol + ", portBegin=" + portBegin + ", portEnd="
+				+ portEnd + ", ipAddress=" + ipAddress + "]";
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Rule other = (Rule) obj;
+		if (direction != other.direction)
+			return false;
+		if (portEnd == 0) {
+			if (portBegin != other.portBegin)
+				return false;
+		} else if ((other.portBegin < portBegin || portEnd < other.portEnd))
+			return false;
+		if (!(ipAddress.equals(other.ipAddress)))
+			return false;
+		if (protocol != other.protocol)
+			return false;
+
+		return true;
+	}
+}

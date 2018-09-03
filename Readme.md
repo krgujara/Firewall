@@ -17,7 +17,7 @@ Second Version - (Firewall_v2)
 - Divided the allowedRules list into the small chunks of lists.
   Created a thread pool with certain fixed number of threads.
   Each thread in the thread pool is responsible to check if the incoming packet
-  matches any given rule (in it's respective chunk).
+  matches any given rule (in it's respective chunk). If the matching rule is found, it sets the isFound variable, and then returns from that function.
 
 - Note - I have used Guava's Lists.partition(List, int) method to this.
 https://google.github.io/guava/releases/snapshot/api/docs/com/google/common/collect/Lists.html#partition-java.util.List-int-
